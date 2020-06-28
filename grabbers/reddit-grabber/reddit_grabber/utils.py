@@ -128,7 +128,7 @@ def get_configuration() -> GrabberConfiguration:
     subreddit_name: str = os.environ.get("RG_SUBREDDIT")
     subreddit_name = subreddit_name if subreddit_name else "all"
     tags_line: Optional[str] = os.environ.get("RG_TAGS")
-    tags: List[str] = ["img"]
+    tags: List[str] = ["img", "reddit"]
     if tags_line:
         tags.extend(tags_line.split(";"))
 
