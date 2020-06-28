@@ -33,16 +33,13 @@ def process_submission(submission: Submission, conf: GrabberConfiguration) -> No
     url = submission.url if hasattr(submission, "url") else None
 
     if url_was_already_processed(url):
-        print("Skipped url")
         return
 
     phash = str(get_hash(get_image(submission)))
 
     if phash_was_already_processed(phash):
-        print("Skipped hash")
         return
 
-    print("Gogogogog")
     register_submission(url=url, phash=phash, ttl=conf.redis_internal_ttl)
     publish_submission(GotRedditEvent.from_submission(submission, conf))
 
