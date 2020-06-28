@@ -1,0 +1,51 @@
+@startuml tom-design-1
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/release/1-0/C4_Container.puml
+
+skinparam wrapWidth 350
+skinparam maxMessageSize 250
+
+title Container diagram for The One Memer
+
+LAYOUT_WITH_LEGEND()
+LAYOUT_LEFT_RIGHT
+LAYOUT_AS_SKETCH()
+
+System_Ext(reddit, "Reddit API")
+System_Ext(twitter, "Twitter API")
+System_Ext(tbot, "Telegram bot api")
+
+System_Boundary(yasdm, "The One Memer") {
+    Container(reddit_grabber, "Reddit Image Grabber", "Python, praw, redis-py", "Gets images from configured subreddits")
+    Container(twitter_grabber, "Twitter Image Grabber", "Python?", "Gets images from configured Twitter accounts")
+
+
+    Container(telegram_voter, "Telegram Voter", "Python, aiogram", "Processes the results of the votes for memes")
+
+    Container(telegram_poster, "Telegram Poster", "Python, aiogram", "Posts images to the specified telegram channel")
+
+    Container(redis, "Redis", "Redis storage")
+
+    Rel(reddit_grabber, redis, "Writes, reads and clears urls and phashes in gr_phashes and gr_urls", "RESP")
+    Rel(reddit_grabber, redis, "Publishes events to the channel named grabbers.events", "RESP")
+    Rel(twitter_grabber, redis, "Writes, reads and clears urls and phashes in gr_phashes and gr_urls", "RESP")
+    Rel(twitter_grabber, redis, "Publishes events to the channel named grabbers.events", "RESP")
+
+    Rel(redis, telegram_voter, "Sends events from the channel named grabbers.events", "RESP")
+    Rel(telegram_voter, redis, "Publishes event to the channel named voters.events", "RESP")
+    Rel(telegram_voter, redis, "Writes, reads and clears its stack of accepted events", "RESP")
+
+    Rel(redis, telegram_poster, "Sends events from the channel named voters.events", "RESP")
+    Rel(telegram_poster, redis, "Writes, reads and clears its stack of accepted events", "RESP")
+}
+
+Rel(reddit_grabber, reddit, "Gets images", "https")
+Rel(twitter_grabber, twitter, "Gets images", "https")
+
+Rel(telegram_voter, tbot, "Sends images to the voters, collects their responses", "https")
+Rel(telegram_poster, tbot, "Sends images to the target channel", "https")
+
+
+
+
+
+@enduml
