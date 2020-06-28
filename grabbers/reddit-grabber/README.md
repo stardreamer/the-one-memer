@@ -13,7 +13,7 @@ Reddit Grabber can be configured throughthe use of environment variables.
 |   `RG_CLIENT_SECRET`    |                         Reddit API Client Secret                          |            -            |    +     |
 |     `RG_USER_AGENT`     |              Reddit API User Agent (name of your reddit app)              |            -            |    +     |
 |         `RG_ID`         |   Id of your reddit grabber. Uniqueness across services is not required   |            -            |    +     |
-|     `RG_SUBREDDIT`      |       Monitored subbredit name (can be in composite "r1+r2" format)        |           all           |    -     |
+|     `RG_SUBREDDIT`      |       Monitored subbredit name (can be in composite "r1+r2" format)       |           all           |    -     |
 |        `RG_TAGS`        |         Tags to mark processed entries (must be separated by `;`)         | "img" (always appended) |    -     |
 |        `RG_MODE`        |                    Polling mode (stream, hot, rising)                     |         stream          |    -     |
 |    `RG_POST_WINDOW`     |      Number of historical posts to process (only for hot and rising)      |           100           |    -     |
@@ -25,7 +25,6 @@ Reddit Grabber can be configured throughthe use of environment variables.
 |     `RG_REDIS_PORT`     |                                Redis port                                 |          6379           |    -     |
 |      `RG_REDIS_DB`      |                              Redis db number                              |            0            |    -     |
 | `RG_REDIS_INTERNAL_TTL` | TTL in seconds for urls and hashes in Redis db (`inf` in case if not set) |            -            |    -     |
-|      `RG_REDIS_DB`      |                              Redis db number                              |            0            |    -     |
 
 
 ## Events
