@@ -9,7 +9,9 @@ from reddit_grabber.exceptions import RedditGrabberException
 from reddit_grabber.redis_utils import (
     register_submission,
     connect_to_redis,
-    publish_submission, url_was_already_processed, phash_was_already_processed,
+    publish_submission,
+    url_was_already_processed,
+    phash_was_already_processed,
 )
 from reddit_grabber.utils import (
     is_image,
@@ -38,6 +40,7 @@ def process_submission(submission: Submission, conf: GrabberConfiguration) -> No
     phash = str(get_hash(get_image(submission)))
 
     if phash_was_already_processed(phash):
+        register_submission(url=url, phash=None, ttl=conf.redis_internal_ttl)
         return
 
     register_submission(url=url, phash=phash, ttl=conf.redis_internal_ttl)
