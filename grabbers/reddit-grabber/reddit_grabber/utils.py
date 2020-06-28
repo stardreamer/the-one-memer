@@ -131,6 +131,7 @@ def get_configuration() -> GrabberConfiguration:
     tags: List[str] = ["img", "reddit"]
     if tags_line:
         tags.extend(tags_line.split(";"))
+        tags = list(set(tags))
 
     mode: Optional[str] = os.environ.get("RG_MODE")
 
