@@ -49,8 +49,8 @@ This event is sent to PUBSUB Redis channel named `grabbers.events` as JSON strin
 |          title          |              Submission title               |
 |         author          |              Author's username              |
 |        shortlink        |        Shortlink to the  submission         |
-|         over_18         |        Was content marked as mature         |
-|   is_original_content   |       Was content marked as original        |
+|         over_18         |        Content was marked as mature         |
+|   is_original_content   |       Content was marked as original        |
 
 ### Example
 
