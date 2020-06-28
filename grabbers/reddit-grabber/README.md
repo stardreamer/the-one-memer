@@ -86,4 +86,4 @@ Phashes and urls of processed submissions are stored in SortedSets named `gr_pha
 
 ## Notes
 
-Python library [ImageHash](https://pypi.org/project/ImageHash/) is used to compute [phash](https://en.wikipedia.org/wiki/Perceptual_hashing) of the image.
+Python library [ImageHash](https://pypi.org/project/ImageHash/) was used to compute [phash](https://en.wikipedia.org/wiki/Perceptual_hashing) of the image.
