@@ -16,6 +16,8 @@ gr_events = "grabbers.events"
 
 def connect_to_redis(config: GrabberConfiguration) -> None:
     global connection
+    if connection is not None:
+        return
     connection = redis.StrictRedis(
         host=config.redis_host, port=config.redis_port, db=config.redis_db
     )
