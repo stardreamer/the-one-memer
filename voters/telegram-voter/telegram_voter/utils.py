@@ -1,7 +1,7 @@
 import datetime
 import os
 from dataclasses import dataclass
-from typing import List, Optional
+from typing import List, Optional, Dict
 
 from telegram_voter.exceptions import TelegramVoterException
 
@@ -30,6 +30,7 @@ class VoterConfiguration:
     telegram_token: str
     target_group: int
     vote_interval: int
+    vote_threshold: int
 
 
 def get_configuration() -> VoterConfiguration:
@@ -72,6 +73,9 @@ def get_configuration() -> VoterConfiguration:
     vote_interval: Optional[str] = os.environ.get("TV_VOTE_INTERVAL")
     vote_interval: int = int(vote_interval) if vote_interval else 300
 
+    vote_threshold: Optional[str] = os.environ.get("TV_VOTE_THRESHOLD")
+    vote_threshold: int = int(vote_threshold) if vote_threshold else 1
+
     redis_host: str = os.environ.get("TV_REDIS_HOST")
     redis_host = redis_host if redis_host else "localhost"
 
@@ -96,4 +100,5 @@ def get_configuration() -> VoterConfiguration:
         target_group=target_group,
         vote_interval=vote_interval,
         telegram_token=telegram_token,
+        vote_threshold=vote_threshold,
     )
