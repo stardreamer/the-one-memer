@@ -1,12 +1,13 @@
+from enum import Enum, auto
 from threading import Thread
-from typing import Optional, Dict, Callable, Union
+from typing import Optional, Dict, Callable, Union, Tuple
 
 import redis
 from redis import StrictRedis
 
 from telegram_voter.exceptions import TelegramVoterException
 from telegram_voter.utils import VoterConfiguration, get_current_utc_timestamp
-from telegram_voter.votes import Vote
+from telegram_voter.votes import Vote, VoteAttemptResult
 
 gr_events = "grabbers.events"
 vt_events = "voters.events"
@@ -63,52 +64,52 @@ def remove_expired_votes(func: Callable) -> Callable:
 
 
 @remove_expired_votes
-def vote(vid: str, voter: int, up: bool) -> Optional[Vote]:
-    v = get_vote(vid)
+def vote(mid: int, voter: int, up: bool) -> Tuple[Optional[Vote], VoteAttemptResult]:
+    v = get_vote(mid)
 
     if not v:
-        return
+        return None, VoteAttemptResult.VoteWasFinished
 
     if v.finished:
-        return v
+        return v, VoteAttemptResult.VoteWasFinished
 
     if up:
         if voter in v.against_votes:
             connection.zincrby(down_voters, -1, voter)
-        v.upvote(voter)
+        res = v.upvote(voter)
         connection.zincrby(up_voters, 1, voter)
     else:
         if voter in v.for_votes:
             connection.zincrby(up_voters, -1, voter)
-        v.downvote(voter)
+        res = v.downvote(voter)
         connection.zincrby(down_voters, 1, voter)
 
-    connection.hset(votes, vid, v.as_json())
+    connection.hset(votes, mid, v.as_json())
 
-    return v
-
-
-def upvote(vid: str, voter: int) -> Optional[Vote]:
-    return vote(vid, voter, True)
+    return v, res
 
 
-def downvote(vid: str, voter: int) -> Optional[Vote]:
-    return vote(vid, voter, False)
+def upvote(mid: int, voter: int) -> Tuple[Optional[Vote], VoteAttemptResult]:
+    return vote(mid, voter, True)
 
 
-def move_vote(vt: Vote, new_vid: str) -> Optional[Vote]:
-    original_vote = get_vote(vt.vid)
+def downvote(mid: int, voter: int) -> Tuple[Optional[Vote], VoteAttemptResult]:
+    return vote(mid, voter, False)
+
+
+def move_vote(vt: Vote, new_vid: int) -> Optional[Vote]:
+    original_vote = get_vote(vt.mid)
 
     if not original_vote:
         return None
 
-    connection.hdel(votes, original_vote.vid)
-    ttl = connection.zscore(votes_ttl, original_vote.vid)
+    connection.hdel(votes, original_vote.mid)
+    ttl = connection.zscore(votes_ttl, original_vote.mid)
 
-    connection.zrem(votes_ttl, original_vote.vid)
-    vt.vid = new_vid
-    connection.zadd(votes_ttl, vt.vid, ttl)
-    connection.hset(votes, vt.vid, vt.as_json())
+    connection.zrem(votes_ttl, original_vote.mid)
+    vt.mid = new_vid
+    connection.zadd(votes_ttl, vt.mid, ttl)
+    connection.hset(votes, vt.mid, vt.as_json())
 
     return vt
 
@@ -121,9 +122,9 @@ def register_vote(vote: Vote) -> None:
     try:
         js = vote.as_json()
 
-        connection.zadd(votes_ttl, {vote.vid: "+inf"})
+        connection.zadd(votes_ttl, {vote.mid: "+inf"})
 
-        connection.hset(votes, vote.vid, js)
+        connection.hset(votes, vote.mid, js)
     except TypeError as e:
         raise TelegramVoterException(str(e))
 
@@ -136,14 +137,14 @@ def update_vote(vote: Vote, ttl: Optional[int]) -> None:
     if vote.finished:
         utc_timestamp = get_current_utc_timestamp()
         expire_time: Union[int, str] = int(utc_timestamp + ttl) if ttl else "+inf"
-        connection.zadd(votes_ttl, {vote.vid: expire_time})
+        connection.zadd(votes_ttl, {vote.mid: expire_time})
 
-    connection.hset(votes, vote.vid, vote.as_json())
+    connection.hset(votes, vote.mid, vote.as_json())
 
 
 @remove_expired_votes
-def get_vote(vid: str) -> Optional[Vote]:
-    s_vote = connection.hget(votes, vid)
+def get_vote(mid: int) -> Optional[Vote]:
+    s_vote = connection.hget(votes, mid)
     return Vote.from_str(s_vote) if s_vote else None
 
 

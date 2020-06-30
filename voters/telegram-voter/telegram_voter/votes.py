@@ -1,28 +1,44 @@
 import dataclasses
 import json
 from dataclasses import dataclass
+from enum import Enum, auto
 from typing import List, Set
 
 from telegram_voter.events import GotEvent
 
 
+class VoteAttemptResult(Enum):
+    Accepted = auto()
+    VoteWasFinished = auto()
+    VotedAlready = auto()
+
 @dataclass
 class Vote:
-    vid: str
+    mid: int
     for_votes: List[int]
     against_votes: List[int]
     base_event: str
     threshold: int
 
-    def upvote(self, voter: int) -> None:
-        self.for_votes.append(voter)
+    def upvote(self, voter: int) -> VoteAttemptResult:
+        if voter not in self.for_votes:
+            self.for_votes.append(voter)
+        else:
+            return VoteAttemptResult.VotedAlready
         if voter in self.against_votes:
             self.against_votes.remove(voter)
 
-    def downvote(self, voter: int) -> None:
-        self.against_votes.append(voter)
+        return VoteAttemptResult.Accepted
+
+    def downvote(self, voter: int) -> VoteAttemptResult:
+        if voter not in self.against_votes:
+            self.against_votes.append(voter)
+        else:
+            return VoteAttemptResult.VotedAlready
         if voter in self.for_votes:
             self.for_votes.remove(voter)
+
+        return VoteAttemptResult.Accepted
 
     @property
     def up(self) -> int:
@@ -45,9 +61,9 @@ class Vote:
         return len(self.against_votes) >= self.threshold
 
     @staticmethod
-    def from_got_event(mid: int, sid: str, threshold: int, ev: GotEvent) -> "Vote":
+    def from_got_event(mid: int, threshold: int, ev: GotEvent) -> "Vote":
         return Vote(
-            vid=f"{sid}_{mid}",
+            mid=mid,
             for_votes=[],
             against_votes=[],
             base_event=ev.original_event,

@@ -4,6 +4,7 @@ from datetime import datetime
 from typing import Optional, Dict
 
 from aiogram import Bot, Dispatcher, types
+from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.types import Message
 from aiogram.utils import executor
 
@@ -26,12 +27,12 @@ from telegram_voter.redis_utils import (
     move_vote,
 )
 from telegram_voter.utils import get_configuration, get_current_utc_timestamp
-from telegram_voter.votes import Vote
+from telegram_voter.votes import Vote, VoteAttemptResult
 
 config = get_configuration()
 
 bot = Bot(token=config.telegram_token)
-dp = Dispatcher(bot)
+dp = Dispatcher(bot, storage=MemoryStorage())
 
 
 @dp.message_handler(commands=["start", "help"])
@@ -43,6 +44,9 @@ async def send_welcome(message: types.Message):
 
 
 @dp.callback_query_handler(lambda c: c.data and c.data.startswith("tv_"))
+@dp.throttled(
+    None, rate=config.vote_throttle,
+)
 async def process_callback(callback_query: types.CallbackQuery):
     if callback_query.message.chat.id != config.target_group:
         return
@@ -54,25 +58,32 @@ async def process_callback(callback_query: types.CallbackQuery):
     voter = callback_query.from_user.id
 
     if callback_query.data == up_code:
-        v = upvote(f"{config.service_id}_{mid}", voter)
-        await bot.edit_message_reply_markup(
-            chat_id=callback_query.message.chat.id,
-            message_id=mid,
-            reply_markup=get_keyboard(vote=v),
-        )
+        v, res = upvote(mid, voter)
+        await process_vote(callback_query, mid, res, v)
 
     elif callback_query.data == down_code:
-        v = downvote(f"{config.service_id}_{mid}", voter)
-        await bot.edit_message_reply_markup(
-            chat_id=callback_query.message.chat.id,
-            message_id=mid,
-            reply_markup=get_keyboard(vote=v),
-        )
+        v, res = downvote(mid, voter)
+        await process_vote(callback_query, mid, res, v)
 
     elif callback_query.data == accepted_code or callback_query.data == declined_code:
         await bot.answer_callback_query(callback_query.id, text="This vote is finished")
     else:
         await bot.answer_callback_query(callback_query.id)
+
+
+async def process_vote(callback_query, mid, res, v):
+    if res == VoteAttemptResult.VoteWasFinished:
+        await bot.answer_callback_query(callback_query.id, text="This vote is over")
+    elif res == VoteAttemptResult.VotedAlready:
+        await bot.answer_callback_query(callback_query.id, text="You've voted already")
+    elif res == VoteAttemptResult.Accepted:
+        await bot.edit_message_reply_markup(
+            chat_id=callback_query.message.chat.id,
+            message_id=mid,
+            reply_markup=get_keyboard(vote=v),
+        )
+    else:
+        await bot.answer_callback_query(callback_query.id, text="Unknown error")
 
 
 async def poll_for_memes():
@@ -91,7 +102,7 @@ async def poll_for_memes():
                     reply_markup=get_keyboard(),
                 )
                 vote = Vote.from_got_event(
-                    mess.message_id, config.service_id, config.vote_threshold, event
+                    mess.message_id, config.vote_threshold, event
                 )
                 register_vote(vote)
             except Exception:
@@ -110,6 +121,6 @@ if __name__ == "__main__":
     connect_to_redis(config)
     gr_event_thread = subscribe_to_grabber_events(grabber_handler)
 
-    dp.loop.create_task(poll_for_memes())
+    # dp.loop.create_task(poll_for_memes())
 
     executor.start_polling(dp, skip_updates=True)
