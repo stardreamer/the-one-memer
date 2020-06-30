@@ -25,6 +25,7 @@ from telegram_voter.redis_utils import (
     upvote,
     downvote,
     move_vote,
+    publish_approved_submission,
 )
 from telegram_voter.utils import get_configuration, get_current_utc_timestamp
 from telegram_voter.votes import Vote, VoteAttemptResult
@@ -60,6 +61,8 @@ async def process_callback(callback_query: types.CallbackQuery):
     if callback_query.data == up_code:
         v, res = upvote(mid, voter)
         await process_vote(callback_query, mid, res, v)
+        if v.accepted:
+            publish_approved_submission(v, config.tags)
 
     elif callback_query.data == down_code:
         v, res = downvote(mid, voter)
@@ -114,13 +117,13 @@ async def poll_for_memes():
 
 
 def grabber_handler(event: Dict) -> None:
-    push_gr_event(event["data"])
+    push_gr_event(event["data"], config.tags)
 
 
 if __name__ == "__main__":
     connect_to_redis(config)
     gr_event_thread = subscribe_to_grabber_events(grabber_handler)
 
-    # dp.loop.create_task(poll_for_memes())
+    dp.loop.create_task(poll_for_memes())
 
     executor.start_polling(dp, skip_updates=True)

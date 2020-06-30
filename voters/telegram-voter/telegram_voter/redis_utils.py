@@ -1,10 +1,11 @@
 from enum import Enum, auto
 from threading import Thread
-from typing import Optional, Dict, Callable, Union, Tuple
+from typing import Optional, Dict, Callable, Union, Tuple, List
 
 import redis
 from redis import StrictRedis
 
+from telegram_voter.events import TgApprovedEvent, get_event_from_string
 from telegram_voter.exceptions import TelegramVoterException
 from telegram_voter.utils import VoterConfiguration, get_current_utc_timestamp
 from telegram_voter.votes import Vote, VoteAttemptResult
@@ -162,8 +163,14 @@ def subscribe_to_grabber_events(handler: Callable) -> Thread:
     return subscribe(gr_events, handler)
 
 
-def push_gr_event(event: str) -> None:
-    connection.lpush(events_to_process_stack, event)
+def push_gr_event(event: str, accepted_tags: List[str]) -> None:
+    if not accepted_tags:
+        connection.lpush(events_to_process_stack, event)
+    else:
+        ev = get_event_from_string(event)
+
+        if all([at in ev.tags for at in accepted_tags]):
+            connection.lpush(events_to_process_stack, event)
 
 
 def pop_gr_event() -> Optional[str]:
@@ -172,3 +179,13 @@ def pop_gr_event() -> Optional[str]:
 
 def clear_gr_event_stack() -> None:
     connection.delete(events_to_process_stack)
+
+
+@remove_expired_votes
+def publish_approved_submission(v: Vote, tags: List[str]) -> None:
+    if not connection:
+        raise TelegramVoterException("There is no connection to Redis")
+
+    event = TgApprovedEvent.from_vote(v, tags)
+
+    connection.publish(vt_events, event.as_json())

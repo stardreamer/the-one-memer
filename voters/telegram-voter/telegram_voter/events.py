@@ -1,5 +1,9 @@
+import dataclasses
 import json
+from dataclasses import dataclass
 from typing import List, Optional, Dict
+
+from telegram_voter.votes import Vote
 
 
 class GotEvent:
@@ -62,7 +66,7 @@ class GotRedditEvent(GotEvent):
     @property
     def description(self) -> str:
         striped_title = self.title.strip()
-        real_title = striped_title[:-1] if striped_title[-1] == '.' else striped_title
+        real_title = striped_title[:-1] if striped_title[-1] == "." else striped_title
         return f"""[{self.subreddit_name_prefixed}]({self.shortlink}) ({self.ups})
 
 *{real_title}.* 
@@ -88,3 +92,21 @@ def get_event_from_dict(d: Dict) -> GotEvent:
 def get_event_from_string(s: str) -> GotEvent:
     d = json.loads(s)
     return get_event_from_dict(d)
+
+
+@dataclass
+class TgApprovedEvent:
+    tags: Optional[List[str]]
+    original_event: str
+    up: int
+    down: int
+    type: str = "Approved_Tg_Submission"
+
+    def as_json(self) -> str:
+        return json.dumps(dataclasses.asdict(self), separators=(",", ":"))
+
+    @staticmethod
+    def from_vote(v: Vote, tags: List[str]) -> "TgApprovedEvent":
+        return TgApprovedEvent(
+            tags=tags, up=v.up, down=v.down, original_event=v.base_event
+        )

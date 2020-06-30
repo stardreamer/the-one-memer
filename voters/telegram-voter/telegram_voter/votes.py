@@ -4,13 +4,17 @@ from dataclasses import dataclass
 from enum import Enum, auto
 from typing import List, Set
 
-from telegram_voter.events import GotEvent
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from telegram_voter.events import GotEvent
 
 
 class VoteAttemptResult(Enum):
     Accepted = auto()
     VoteWasFinished = auto()
     VotedAlready = auto()
+
 
 @dataclass
 class Vote:
@@ -61,7 +65,7 @@ class Vote:
         return len(self.against_votes) >= self.threshold
 
     @staticmethod
-    def from_got_event(mid: int, threshold: int, ev: GotEvent) -> "Vote":
+    def from_got_event(mid: int, threshold: int, ev: "GotEvent") -> "Vote":
         return Vote(
             mid=mid,
             for_votes=[],
