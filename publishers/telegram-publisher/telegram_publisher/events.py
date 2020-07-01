@@ -122,7 +122,7 @@ class ApprovedRedditEvent(ApprovedEvent):
     def description(self) -> str:
         striped_title = self.reddit_details.title.strip()
         real_title = striped_title[:-1] if striped_title[-1] == "." else striped_title
-        return f"""[{self.reddit_details.subreddit_name_prefixed}]({self.reddit_details.shortlink}) ({self.reddit_details.ups})
+        return f"""[{self.reddit_details.subreddit_name_prefixed}]({self.reddit_details.shortlink})
 
 *{real_title}.* 
 — _{self.reddit_details.author}_
