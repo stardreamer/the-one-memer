@@ -107,6 +107,7 @@ async def poll_for_memes():
                         mess.message_id, config.vote_threshold, event
                     )
                     register_vote(vote)
+                    await asyncio.sleep(0.5)
                 except Exception:
                     pass
 
