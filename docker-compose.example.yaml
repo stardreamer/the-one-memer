@@ -1,0 +1,55 @@
+version: '3.6'
+
+services:
+
+  redis:
+    image: redis
+    restart: unless-stopped
+    volumes:
+      - redis_pers:/var/lib/redis
+
+  voter:
+    image: voter
+    restart: unless-stopped
+    environment:
+      TV_ID: "voter_from_docker"
+      TV_API_TOKEN: "TV_API_TOKEN"
+      TV_TARGET_GROUP: "TV_TARGET_GROUP"
+      TV_VOTE_INTERVAL: "10"
+      TV_VOTE_THRESHOLD: "1"
+      TV_REDIS_HOST: "redis"
+    depends_on:
+      - redis
+
+  publisher:
+    image: publisher
+    restart: unless-stopped
+    environment:
+      TP_ID: "publisher_from_docker"
+      TP_API_TOKEN: "TP_API_TOKEN"
+      TP_TARGET_CHANNEL: "TP_TARGET_CHANNEL"
+      TP_PUBLISHING_INTERVAL: "10"
+      TP_WITH_DESCRIPTION: "false"
+      TP_REDIS_HOST: "redis"
+    depends_on:
+      - redis
+
+  grabber:
+    image: grabber
+    restart: unless-stopped
+    environment:
+      RG_CLIENT_ID: "RG_CLIENT_ID"
+      RG_CLIENT_SECRET: "RG_CLIENT_SECRET"
+      RG_USER_AGENT: "RG_USER_AGENT"
+      RG_SUBREDDIT: "RPGhumor+dndmemes"
+      RG_TAGS: "dnd;rpg;meme;humor"
+      RG_ID: "grabber_from_docker"
+      RG_REDIS_HOST: "redis"
+    depends_on:
+      - redis
+
+
+volumes:
+  redis_pers:
+    external:
+      name: redis_pers

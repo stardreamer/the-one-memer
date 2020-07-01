@@ -14,8 +14,8 @@ def get_two_button_markup(vote: Optional[Vote] = None) -> InlineKeyboardMarkup:
     upvotes = vote.up if vote else 0
     downvotes = vote.down if vote else 0
 
-    upvote_btn = InlineKeyboardButton(f"👍 {upvotes}", callback_data=up_code)
-    downvote_btn = InlineKeyboardButton(f"👎 {downvotes}", callback_data=down_code)
+    upvote_btn = InlineKeyboardButton(f"🔥 {upvotes}", callback_data=up_code)
+    downvote_btn = InlineKeyboardButton(f"🗑 {downvotes}", callback_data=down_code)
     inline_kb = InlineKeyboardMarkup(row_width=2)
     inline_kb.row(upvote_btn, downvote_btn)
     return inline_kb
@@ -28,11 +28,11 @@ def get_default_keyboard(vote: Optional[Vote]) -> InlineKeyboardMarkup:
         if vote.finished:
             if vote.accepted:
                 finished_btn = InlineKeyboardButton(
-                    "Submission was accepted", callback_data=accepted_code
+                    "Submission was accepted 🚀", callback_data=accepted_code
                 )
             else:
                 finished_btn = InlineKeyboardButton(
-                    "Submission was declined", callback_data=declined_code
+                    "Submission was declined 👾", callback_data=declined_code
                 )
             inline_kb = InlineKeyboardMarkup(row_width=1)
             inline_kb.row(finished_btn)
