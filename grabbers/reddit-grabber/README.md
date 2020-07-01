@@ -5,7 +5,7 @@ This project aims to simplify image grabbing for "The One Memer".
 
 ## Configuration
 
-Reddit Grabber can be configured throughthe use of environment variables.
+Reddit Grabber can be configured through the use of environment variables.
 
 |        Variable         |                                Description                                |           Default Value           | Required |
 | :---------------------: | :-----------------------------------------------------------------------: | :-------------------------------: | :------: |
@@ -29,7 +29,7 @@ Reddit Grabber can be configured throughthe use of environment variables.
 
 ## Events
 
-## GotRedditEvent
+## Got_Reddit_Submission
 
 This event is sent to PUBSUB Redis channel named `grabbers.events` as JSON string.
 
@@ -37,6 +37,7 @@ This event is sent to PUBSUB Redis channel named `grabbers.events` as JSON strin
 
 |          Field          |                 Description                 |
 | :---------------------: | :-----------------------------------------: |
+|         version         |                Event version                |
 |          tags           |                List of tags                 |
 |           url           |          Url to the embedded image          |
 |          type           |                 Event type                  |
@@ -55,11 +56,12 @@ This event is sent to PUBSUB Redis channel named `grabbers.events` as JSON strin
 
 ```json
 {
+   "version": "1.1",
    "tags":[
       "img",
       "dnd",
       "rpg",
-      "meme",
+      "meme",  
       "humor"
    ],
    "url":"https://i.redd.it/cfess2pjbm751.png",
