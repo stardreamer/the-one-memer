@@ -33,9 +33,11 @@ class GotRedditEvent:
         self.shortlink: str = shortlink
         self.over_18: bool = over_18
         self.is_original_content: bool = is_original_content
+        self.version = "1.1"
 
     def as_dict(self) -> Dict:
         base_dict = {
+            "version": self.version,
             "tags": self.tags,
             "url": self.url,
             "type": self.e_type,

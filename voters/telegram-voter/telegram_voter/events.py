@@ -14,8 +14,10 @@ class GotEvent:
         e_type: Optional[str] = None,
         original_event: str = None,
         source: str = None,
+        version: str = None,
     ) -> None:
         self.tags: Optional[List[str]] = tags
+        self.version: Optional[List[str]] = version
         self.url: Optional[str] = url
         self.e_type: Optional[str] = e_type
         self.source: Optional[str] = source
@@ -35,6 +37,7 @@ class GotEvent:
             e_type=d["type"],
             original_event=js,
             source=d["source"],
+            version=d["version"],
         )
 
 
@@ -55,8 +58,9 @@ class GotRedditEvent(GotEvent):
         ts: Optional[float] = None,
         type: Optional[str] = None,
         original_event: Optional[str] = None,
+        version: Optional[str] = None,
     ) -> None:
-        super().__init__(tags, url, type, original_event, source)
+        super().__init__(tags, url, type, original_event, source, version=version)
         self.ups: Optional[int] = ups
         self.downs: Optional[int] = downs
         self.subreddit_name_prefixed: Optional[str] = subreddit_name_prefixed
@@ -107,6 +111,7 @@ class TgApprovedEvent:
     down: int
     source: str
     type: str = "Approved_Tg_Submission"
+    version: str = "1.1"
 
     def as_json(self) -> str:
         return json.dumps(dataclasses.asdict(self), separators=(",", ":"))

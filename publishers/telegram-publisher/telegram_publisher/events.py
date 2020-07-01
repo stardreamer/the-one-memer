@@ -14,6 +14,7 @@ class ApprovedEvent:
         original_event: str = None,
         original_tags: Optional[List[str]] = None,
         source: Optional[str] = None,
+        version: Optional[str] = None,
     ) -> None:
         self.tags: Optional[List[str]] = tags
         self.original_tags: Optional[List[str]] = original_tags
@@ -22,6 +23,7 @@ class ApprovedEvent:
         self.down: Optional[int] = down
         self.type: Optional[str] = type
         self.source: Optional[str] = source
+        self.version: Optional[str] = version
         self.original_event: Optional[str] = original_event
 
     @property
@@ -50,6 +52,7 @@ class ApprovedEvent:
             down=d["down"],
             source=d["source"],
             original_tags=or_ev["tags"],
+            version=d["version"],
         )
 
 
@@ -66,6 +69,7 @@ class RedditDetails:
     shortlink: str
     ups: Optional[int] = None
     downs: Optional[int] = None
+    version: Optional[str] = None
 
     @staticmethod
     def from_str(rs: str) -> "RedditDetails":
@@ -83,6 +87,7 @@ class RedditDetails:
             shortlink=d.get("shortlink") if d.get("shortlink") else "",
             ups=d.get("ups"),
             downs=d.get("downs"),
+            version=d.get("version"),
         )
 
 
@@ -97,6 +102,7 @@ class ApprovedRedditEvent(ApprovedEvent):
         original_event: str = None,
         source: Optional[str] = None,
         reddit_details: Optional[RedditDetails] = None,
+        version: Optional[str] = None,
     ) -> None:
         super().__init__(
             tags=tags,
@@ -107,6 +113,7 @@ class ApprovedRedditEvent(ApprovedEvent):
             down=down,
             type=type,
             source=source,
+            version=version,
         )
 
         self.reddit_details = reddit_details
@@ -138,6 +145,7 @@ class ApprovedRedditEvent(ApprovedEvent):
             down=d["down"],
             source=d["source"],
             reddit_details=reddit_details,
+            version=d["version"],
         )
 
 
