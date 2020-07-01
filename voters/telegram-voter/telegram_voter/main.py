@@ -62,7 +62,7 @@ async def process_callback(callback_query: types.CallbackQuery):
         v, res = upvote(mid, voter)
         await process_vote(callback_query, mid, res, v)
         if v.accepted:
-            publish_approved_submission(v, config.tags)
+            publish_approved_submission(v, config.tags, config.service_id)
 
     elif callback_query.data == down_code:
         v, res = downvote(mid, voter)

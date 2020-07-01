@@ -1,6 +1,5 @@
-from enum import Enum, auto
 from threading import Thread
-from typing import Optional, Dict, Callable, Union, Tuple, List
+from typing import Optional, Callable, Union, Tuple, List
 
 import redis
 from redis import StrictRedis
@@ -182,10 +181,10 @@ def clear_gr_event_stack() -> None:
 
 
 @remove_expired_votes
-def publish_approved_submission(v: Vote, tags: List[str]) -> None:
+def publish_approved_submission(v: Vote, tags: List[str], sid: str) -> None:
     if not connection:
         raise TelegramVoterException("There is no connection to Redis")
 
-    event = TgApprovedEvent.from_vote(v, tags)
+    event = TgApprovedEvent.from_vote(v, tags, sid)
 
     connection.publish(vt_events, event.as_json())

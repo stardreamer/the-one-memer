@@ -13,10 +13,12 @@ class GotEvent:
         url: Optional[str] = None,
         e_type: Optional[str] = None,
         original_event: str = None,
+        source: str = None,
     ) -> None:
         self.tags: Optional[List[str]] = tags
         self.url: Optional[str] = url
         self.e_type: Optional[str] = e_type
+        self.source: Optional[str] = source
         self.original_event: Optional[str] = original_event
 
     @property
@@ -28,7 +30,11 @@ class GotEvent:
         js = json.dumps(d, separators=(",", ":"))
 
         return GotEvent(
-            url=d["url"], tags=d["tags"], e_type=d["type"], original_event=js,
+            url=d["url"],
+            tags=d["tags"],
+            e_type=d["type"],
+            original_event=js,
+            source=d["source"],
         )
 
 
@@ -50,10 +56,9 @@ class GotRedditEvent(GotEvent):
         type: Optional[str] = None,
         original_event: Optional[str] = None,
     ) -> None:
-        super().__init__(tags, url, type, original_event)
+        super().__init__(tags, url, type, original_event, source)
         self.ups: Optional[int] = ups
         self.downs: Optional[int] = downs
-        self.source: Optional[str] = source
         self.subreddit_name_prefixed: Optional[str] = subreddit_name_prefixed
         self.title: Optional[str] = title
         self.author: Optional[str] = author
@@ -100,13 +105,14 @@ class TgApprovedEvent:
     original_event: str
     up: int
     down: int
+    source: str
     type: str = "Approved_Tg_Submission"
 
     def as_json(self) -> str:
         return json.dumps(dataclasses.asdict(self), separators=(",", ":"))
 
     @staticmethod
-    def from_vote(v: Vote, tags: List[str]) -> "TgApprovedEvent":
+    def from_vote(v: Vote, tags: List[str], sid: str) -> "TgApprovedEvent":
         return TgApprovedEvent(
-            tags=tags, up=v.up, down=v.down, original_event=v.base_event
+            tags=tags, up=v.up, down=v.down, original_event=v.base_event, source=sid
         )
