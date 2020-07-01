@@ -90,23 +90,26 @@ async def poll_for_memes():
     while True:
         vote_interval = 1 if config.vote_interval < 1 else config.vote_interval
         scheduled_timestamp: float = get_current_utc_timestamp() + vote_interval
-        event_str = pop_gr_event()
-        if event_str:
-            try:
-                event = get_event_from_string(event_str)
-                mess: Message = await bot.send_photo(
-                    config.target_group,
-                    event.url,
-                    caption=event.description,
-                    parse_mode="Markdown",
-                    reply_markup=get_keyboard(),
-                )
-                vote = Vote.from_got_event(
-                    mess.message_id, config.vote_threshold, event
-                )
-                register_vote(vote)
-            except Exception:
-                pass
+
+        for _ in range(config.vote_batch_size):
+            event_str = pop_gr_event()
+            if event_str:
+                try:
+                    event = get_event_from_string(event_str)
+                    mess: Message = await bot.send_photo(
+                        config.target_group,
+                        event.url,
+                        caption=event.description,
+                        parse_mode="Markdown",
+                        reply_markup=get_keyboard(),
+                    )
+                    vote = Vote.from_got_event(
+                        mess.message_id, config.vote_threshold, event
+                    )
+                    register_vote(vote)
+                    await asyncio.sleep(0.5)
+                except Exception:
+                    pass
 
         current_timestamp = get_current_utc_timestamp()
         if current_timestamp < scheduled_timestamp:
