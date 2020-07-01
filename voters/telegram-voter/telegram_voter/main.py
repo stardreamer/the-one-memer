@@ -1,14 +1,12 @@
 import asyncio
-import json
-from datetime import datetime
-from typing import Optional, Dict
+from typing import Dict
 
 from aiogram import Bot, Dispatcher, types
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.types import Message
 from aiogram.utils import executor
 
-from telegram_voter.events import get_event_from_dict, get_event_from_string
+from telegram_voter.events import get_event_from_string
 from telegram_voter.keyboards import (
     get_keyboard,
     up_code,
@@ -24,7 +22,6 @@ from telegram_voter.redis_utils import (
     register_vote,
     upvote,
     downvote,
-    move_vote,
     publish_approved_submission,
 )
 from telegram_voter.utils import get_configuration, get_current_utc_timestamp
