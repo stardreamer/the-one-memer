@@ -82,7 +82,7 @@ def get_configuration() -> VoterConfiguration:
     vote_threshold: int = int(vote_threshold) if vote_threshold else 1
 
     vote_batch_size: Optional[str] = os.environ.get("TV_BATCH_SIZE")
-    vote_batch_size: int = int(vote_threshold) if vote_threshold else 5
+    vote_batch_size: int = int(vote_batch_size) if vote_batch_size else 5
 
     redis_host: str = os.environ.get("TV_REDIS_HOST")
     redis_host = redis_host if redis_host else "localhost"
@@ -110,5 +110,5 @@ def get_configuration() -> VoterConfiguration:
         telegram_token=telegram_token,
         vote_threshold=vote_threshold,
         vote_throttle=vote_throttle,
-        vote_batch_size=vote_batch_size
+        vote_batch_size=vote_batch_size,
     )
