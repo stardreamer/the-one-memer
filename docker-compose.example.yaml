@@ -10,6 +10,8 @@ services:
 
   voter:
     image: voter
+    build:
+      context: voters/telegram-voter
     restart: unless-stopped
     environment:
       TV_ID: "voter_from_docker"
@@ -23,6 +25,8 @@ services:
 
   publisher:
     image: publisher
+    build:
+      context: publishers/telegram-publisher
     restart: unless-stopped
     environment:
       TP_ID: "publisher_from_docker"
@@ -36,6 +40,8 @@ services:
 
   grabber:
     image: grabber
+    build:
+      context: grabbers/reddit-grabber
     restart: unless-stopped
     environment:
       RG_CLIENT_ID: "RG_CLIENT_ID"
