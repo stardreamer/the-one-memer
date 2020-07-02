@@ -27,6 +27,7 @@ class VoterConfiguration:
     redis_internal_ttl: Optional[int]
     service_id: str
     mature_content_allowed: bool
+    with_description: bool
     telegram_token: str
     target_group: int
     vote_interval: int
@@ -81,6 +82,11 @@ def get_configuration() -> VoterConfiguration:
     vote_threshold: Optional[str] = os.environ.get("TV_VOTE_THRESHOLD")
     vote_threshold: int = int(vote_threshold) if vote_threshold else 1
 
+    with_description: Optional[str] = os.environ.get("TV_WITH_DESCRIPTION")
+    with_description: bool = str_as_bool(
+        with_description
+    ) if with_description else False
+
     vote_batch_size: Optional[str] = os.environ.get("TV_BATCH_SIZE")
     vote_batch_size: int = int(vote_batch_size) if vote_batch_size else 5
 
@@ -111,4 +117,5 @@ def get_configuration() -> VoterConfiguration:
         vote_threshold=vote_threshold,
         vote_throttle=vote_throttle,
         vote_batch_size=vote_batch_size,
+        with_description=with_description,
     )

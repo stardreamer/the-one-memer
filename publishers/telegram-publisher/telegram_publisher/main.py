@@ -49,7 +49,7 @@ async def publish_memes():
                         delay = config.min_delay
 
                     await asyncio.sleep(delay)
-                    
+
                 await bot.send_photo(
                     config.target_channel,
                     event.url,

@@ -97,10 +97,12 @@ async def poll_for_memes():
             if event_str:
                 try:
                     event = get_event_from_string(event_str)
+
+                    caption = event.description if config.with_description else None
                     mess: Message = await bot.send_photo(
                         config.target_group,
                         event.url,
-                        caption=event.description,
+                        caption=caption,
                         parse_mode="Markdown",
                         reply_markup=get_keyboard(),
                     )
