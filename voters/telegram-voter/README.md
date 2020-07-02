@@ -21,7 +21,7 @@ TelegramVoter can be configured through the use of environment variables.
 |     `TV_REDIS_PORT`     |                                                   Redis port                                                    |     6379      |    -     |
 |      `TV_REDIS_DB`      |                                                 Redis db number                                                 |       0       |    -     |
 | `TV_REDIS_INTERNAL_TTL` |                    TTL in seconds for urls and hashes in Redis db (`inf` in case if not set)                    |       -       |    -     |
-
+|     `TV_BATCH_SIZE`     |                                    Number of images to be sent to the voters                                    |       5       |    -     |
 
 ## Events
 
