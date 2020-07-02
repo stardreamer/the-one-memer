@@ -1,4 +1,5 @@
 import asyncio
+from random import random
 from typing import Dict
 
 from aiogram import Bot, Dispatcher
@@ -36,6 +37,15 @@ async def publish_memes():
         event_str = pop_vt_event()
         if event_str:
             try:
+
+                if config.min_delay:
+                    if config.max_delay and config.max_delay > config.min_delay:
+                        delay = random.randint(config.min_delay, config.max_delay)
+                    else:
+                        delay = config.min_delay
+
+                    await asyncio.sleep(delay)
+
                 event = get_event_from_string(event_str)
                 if url_was_already_processed(event.url):
                     continue

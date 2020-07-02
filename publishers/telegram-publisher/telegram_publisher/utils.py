@@ -7,10 +7,7 @@ from telegram_publisher.exceptions import TelegramPublisherException
 
 
 def str_as_bool(l: str) -> bool:
-    if l.lower().strip() == "true":
-        return True
-
-    return False
+    return l.lower().strip() == "true"
 
 
 def get_current_utc_timestamp() -> float:
@@ -33,6 +30,8 @@ class PublisherConfiguration:
     accepted_voters: List[str]
     with_description: bool
     max_queue_len: Optional[int]
+    max_delay: Optional[int]
+    min_delay: Optional[int]
 
 
 def get_configuration() -> PublisherConfiguration:
@@ -87,6 +86,12 @@ def get_configuration() -> PublisherConfiguration:
     publishing_interval: Optional[str] = os.environ.get("TP_PUBLISHING_INTERVAL")
     publishing_interval: int = int(publishing_interval) if publishing_interval else 300
 
+    max_delay: Optional[str] = os.environ.get("TP_MAX_DELAY")
+    max_delay: Optional[int] = abs(int(max_delay)) if max_delay else None
+
+    min_delay: Optional[str] = os.environ.get("TP_MIN_DELAY")
+    min_delay: Optional[int] = abs(int(min_delay)) if min_delay else None
+
     max_queue_len: Optional[str] = os.environ.get("TP_MAX_QUEUE_LEN")
     max_queue_len: Optional[int] = int(max_queue_len) if max_queue_len else None
 
@@ -116,5 +121,7 @@ def get_configuration() -> PublisherConfiguration:
         publishing_interval=publishing_interval,
         accepted_voters=accepted_voters,
         with_description=with_description,
-        max_queue_len=max_queue_len
+        max_queue_len=max_queue_len,
+        max_delay=max_delay,
+        min_delay=min_delay,
     )

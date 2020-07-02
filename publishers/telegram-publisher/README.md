@@ -22,7 +22,8 @@ TelegramVoter can be configured through the use of environment variables.
 |     `TP_REDIS_PORT`      |                                                   Redis port                                                    |     6379      |    -     |
 |      `TP_REDIS_DB`       |                                                 Redis db number                                                 |       0       |    -     |
 | `TP_REDIS_INTERNAL_TTL`  |                    TTL in seconds for urls and hashes in Redis db (`inf` in case if not set)                    |       -       |    -     |
-
+|      `TP_MIN_DELAY`      |                               Minimum delay before publishing the sheduled image                                |       -       |    -     |
+|      `TP_MAX_DELAY`      |            Maximum delay before publishing the sheduled image. Ignored if `TP_MIN_DELAY` was not set            |       -       |    -     |
 
 ## Events
 
