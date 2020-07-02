@@ -73,15 +73,16 @@ async def process_callback(callback_query: types.CallbackQuery):
 
 async def process_vote(callback_query, mid, res, v):
     if res == VoteAttemptResult.VoteWasFinished:
-        await bot.answer_callback_query(callback_query.id, text="This vote is over")
+        await bot.answer_callback_query(callback_query.id, text="This vote is over!")
     elif res == VoteAttemptResult.VotedAlready:
-        await bot.answer_callback_query(callback_query.id, text="You've voted already")
+        await bot.answer_callback_query(callback_query.id, text="You've voted already!")
     elif res == VoteAttemptResult.Accepted:
         await bot.edit_message_reply_markup(
             chat_id=callback_query.message.chat.id,
             message_id=mid,
             reply_markup=get_keyboard(vote=v),
         )
+        await bot.answer_callback_query(callback_query.id, text="Roger that!")
     else:
         await bot.answer_callback_query(callback_query.id, text="Unknown error")
 
