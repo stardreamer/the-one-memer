@@ -38,6 +38,10 @@ async def publish_memes():
         if event_str:
             try:
 
+                event = get_event_from_string(event_str)
+                if url_was_already_processed(event.url):
+                    continue
+
                 if config.min_delay:
                     if config.max_delay and config.max_delay > config.min_delay:
                         delay = random.randint(config.min_delay, config.max_delay)
@@ -45,10 +49,7 @@ async def publish_memes():
                         delay = config.min_delay
 
                     await asyncio.sleep(delay)
-
-                event = get_event_from_string(event_str)
-                if url_was_already_processed(event.url):
-                    continue
+                    
                 await bot.send_photo(
                     config.target_channel,
                     event.url,
