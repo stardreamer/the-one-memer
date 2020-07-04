@@ -1,10 +1,8 @@
 import asyncio
-from random import random
+import random
 from typing import Dict
 
 from aiogram import Bot, Dispatcher
-from aiogram.types import Message
-from aiogram.utils import executor
 
 from telegram_publisher.events import get_event_from_string
 from telegram_publisher.redis_utils import (
@@ -16,7 +14,8 @@ from telegram_publisher.redis_utils import (
     cache_url,
     url_was_already_processed,
 )
-from telegram_publisher.utils import get_configuration, get_current_utc_timestamp
+from telegram_publisher.utils import get_configuration, \
+    get_current_utc_timestamp
 
 config = get_configuration()
 
@@ -30,6 +29,7 @@ def voter_handler(event: Dict) -> None:
 
 async def publish_memes():
     while True:
+
         publish_interval = (
             10 if config.publishing_interval < 10 else config.publishing_interval
         )
@@ -59,7 +59,8 @@ async def publish_memes():
 
                 trim_queue(config.max_queue_len)
                 cache_url(event.url, config.redis_internal_ttl)
-            except Exception:
+            except Exception as e:
+                print(e)
                 pass
 
         current_timestamp = get_current_utc_timestamp()
@@ -73,4 +74,4 @@ if __name__ == "__main__":
 
     dp.loop.create_task(publish_memes())
 
-    executor.start_polling(dp, skip_updates=True)
+    dp.loop.run_forever()
